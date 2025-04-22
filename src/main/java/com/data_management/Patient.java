@@ -56,4 +56,7 @@ public class Patient {
                 .filter(record -> record.getTimestamp() >= startTime && record.getTimestamp() <= endTime)
                 .toList();
     }
+    public int getPatientId() {
+        return patientId;
+    }
 }
