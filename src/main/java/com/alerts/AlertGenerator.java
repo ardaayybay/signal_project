@@ -1,6 +1,4 @@
 package com.alerts;
-
-
 import java.util.List;
 
 import com.data_management.DataStorage;
@@ -16,7 +14,6 @@ import com.data_management.PatientRecord;
 public class AlertGenerator {
     private DataStorage dataStorage;
     
-
     /**
      * Constructs an {@code AlertGenerator} with a specified {@code DataStorage}.
      * The {@code DataStorage} is used to retrieve patient data that this class
