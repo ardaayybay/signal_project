@@ -26,10 +26,14 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 
 public class HealthDataSimulator {
-
+    // TODO : Add a logger to log the output instead of printing to console
+    // TODO : Switch to websocket output strategy
+    // TODO : Add a TCP socket output strategy
+    // TODO : Create UML diagrams for the classes and their relationships
     private static int patientCount = 50; // Default number of patients
     private static ScheduledExecutorService scheduler;
     private static OutputStrategy outputStrategy = new ConsoleOutputStrategy(); // Default output strategy
+    private static WebSocketOutputStrategy webSocketOutputStrategy = null;
     private static final Random random = new Random();
 
     public static void main(String[] args) throws IOException {
