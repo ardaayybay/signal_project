@@ -13,13 +13,10 @@ import com.alerts.AlertGenerator;
  * patient IDs.
  */
 public class DataStorage {
-    private Map<Integer, Patient> patientMap; // Stores patient objects indexed by their unique patient ID.
-
-    /**
-     * Constructs a new instance of DataStorage, initializing the underlying storage
-     * structure.
-     */
-    public DataStorage() {
+    private Map<Integer, Patient> patientMap;
+    // Singleton instance of DataStorage
+    private static DataStorage instance = null;   
+    private DataStorage() {
         this.patientMap = new HashMap<>();
     }
 
@@ -43,6 +40,17 @@ public class DataStorage {
             patientMap.put(patientId, patient);
         }
         patient.addRecord(measurementValue, recordType, timestamp);
+    }
+    /*
+     * * Retrieves the singleton instance of the DataStorage class.
+     * This method ensures that only one instance of DataStorage exists in the
+     * system,
+     */
+    public static DataStorage getInstance() {
+        if (instance == null) {
+            instance = new DataStorage();
+        }
+        return instance;
     }
 
     /**
@@ -83,15 +91,13 @@ public class DataStorage {
      * @param args command line arguments
      */
     public static void main(String[] args) {
-        // DataReader is not defined in this scope, should be initialized appropriately.
-        // DataReader reader = new SomeDataReaderImplementation("path/to/data");
-        DataStorage storage = new DataStorage();
-
-        // Assuming the reader has been properly initialized and can read data into the
-        // storage
-        // reader.readData(storage);
-
-        // Example of using DataStorage to retrieve and print records for a patient
+        System.out.println("DataStorage main method running...");
+        
+        DataStorage storage = DataStorage.getInstance();
+        // Optional: Populate dummy data for testing
+        storage.addPatientData(1, 75.0, "HeartRate", 1705000000000L);
+        storage.addPatientData(1, 80.0, "HeartRate", 1706000000000L);
+    
         List<PatientRecord> records = storage.getRecords(1, 1700000000000L, 1800000000000L);
         for (PatientRecord record : records) {
             System.out.println("Record for Patient ID: " + record.getPatientId() +
@@ -99,13 +105,12 @@ public class DataStorage {
                     ", Data: " + record.getMeasurementValue() +
                     ", Timestamp: " + record.getTimestamp());
         }
-
-        // Initialize the AlertGenerator with the storage
+    
         AlertGenerator alertGenerator = new AlertGenerator(storage);
-
-        // Evaluate all patients' data to check for conditions that may trigger alerts
+    
         for (Patient patient : storage.getAllPatients()) {
             alertGenerator.evaluateData(patient);
         }
     }
+    
 }
