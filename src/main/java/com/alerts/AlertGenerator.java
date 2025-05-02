@@ -42,10 +42,38 @@ public class AlertGenerator {
         // an alert is triggered
         List<PatientRecord> records = dataStorage.getRecords(patient.getPatientId(), 0, 1800000000000L);
         for (PatientRecord record : records) {
+            //iplement the alert condition here
+            // also for ecg and other records
+            // For example, if the heart rate exceeds 100 bpm, trigger an alert
             if (record.getRecordType().equals("HeartRate") && record.getMeasurementValue() > 100) {
                 Alert alert = new Alert(String.valueOf(patient.getPatientId()), "High Heart Rate", record.getTimestamp());
                 triggerAlert(alert);
             }
+            // Add other conditions for different record types as needed
+            // For example, if the blood pressure exceeds a certain threshold
+            if (record.getRecordType().equals("BloodPressure") && record.getMeasurementValue() > 140) {
+                Alert alert = new Alert(String.valueOf(patient.getPatientId()), "High Blood Pressure", record.getTimestamp());
+                triggerAlert(alert);
+            }
+            // Add other conditions for different record types as needed
+            // For example, if the ECG shows irregular patterns
+            if (record.getRecordType().equals("ECG") && record.getMeasurementValue() > 120) {
+                Alert alert = new Alert(String.valueOf(patient.getPatientId()), "Irregular ECG", record.getTimestamp());
+                triggerAlert(alert);
+            }
+            // Add other conditions for different record types as needed
+            // For example, if the Hypotensive Hypoxemia is detected
+            if (record.getRecordType().equals("HypotensiveHypoxemia") && record.getMeasurementValue() < 90) {
+                Alert alert = new Alert(String.valueOf(patient.getPatientId()), "Hypotensive Hypoxemia", record.getTimestamp());
+                triggerAlert(alert);
+            }
+            // Add other conditions for different record types as needed
+            // For example, if the blood saturations are too low
+            if (record.getRecordType().equals("BloodSaturation") && record.getMeasurementValue() < 90) {
+                Alert alert = new Alert(String.valueOf(patient.getPatientId()), "Low Blood Saturation", record.getTimestamp());
+                triggerAlert(alert);
+            }
+            
         }
        
     }
@@ -73,15 +101,23 @@ public class AlertGenerator {
      * @param args command-line arguments (not used)
      */
     public static void main(String[] args) {
-        DataStorage dataStorage = new DataStorage();
+        DataStorage dataStorage = DataStorage.getInstance();
         AlertGenerator alertGenerator = new AlertGenerator(dataStorage);
 
         // Create a patient and add some records
         Patient patient = new Patient(1);
         patient.addRecord(95.0, "HeartRate", System.currentTimeMillis() - 10000);
         patient.addRecord(105.0, "HeartRate", System.currentTimeMillis() - 5000);
+        patient.addRecord(120.0, "BloodPressure", System.currentTimeMillis() - 20000);
+        patient.addRecord(80.0, "ECG", System.currentTimeMillis() - 15000);
+        patient.addRecord(85.0, "HypotensiveHypoxemia", System.currentTimeMillis() - 12000);
+        patient.addRecord(75.0, "BloodSaturation", System.currentTimeMillis() - 8000);
+        
         dataStorage.addPatientData(patient.getPatientId(), 105.0, "HeartRate", System.currentTimeMillis() - 5000);
-
+        dataStorage.addPatientData(patient.getPatientId(), 120.0, "BloodPressure", System.currentTimeMillis() - 20000);
+        dataStorage.addPatientData(patient.getPatientId(), 80.0, "ECG", System.currentTimeMillis() - 15000);
+        dataStorage.addPatientData(patient.getPatientId(), 85.0, "HypotensiveHypoxemia", System.currentTimeMillis() - 12000);
+        dataStorage.addPatientData(patient.getPatientId(), 75.0, "BloodSaturation", System.currentTimeMillis() - 8000);
         // Evaluate the patient's data for alerts
         alertGenerator.evaluateData(patient);
 }
