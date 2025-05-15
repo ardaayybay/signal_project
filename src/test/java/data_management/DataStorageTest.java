@@ -1,13 +1,12 @@
 package data_management;
 
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.Test;
 
 import com.data_management.DataStorage;
-//import com.data_management.MockDataReader;
 import com.data_management.PatientRecord;
-
-import java.util.List;
 
 class DataStorageTest {
 
