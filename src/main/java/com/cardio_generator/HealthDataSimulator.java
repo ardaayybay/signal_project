@@ -30,25 +30,46 @@ public class HealthDataSimulator {
     // TODO : Switch to websocket output strategy
     // TODO : Add a TCP socket output strategy
     // TODO : Create UML diagrams for the classes and their relationships
-    private static int patientCount = 50; // Default number of patients
-    private static ScheduledExecutorService scheduler;
-    private static OutputStrategy outputStrategy = new ConsoleOutputStrategy(); // Default output strategy
-    private static WebSocketOutputStrategy webSocketOutputStrategy = null;
+    private int patientCount = 50; // Default number of patients
+    private ScheduledExecutorService scheduler;
+    private OutputStrategy outputStrategy = new ConsoleOutputStrategy(); // Default output strategy
     private static final Random random = new Random();
-
-    public static void main(String[] args) throws IOException {
-
-        parseArguments(args);
-
-        scheduler = Executors.newScheduledThreadPool(patientCount * 4);
-
-        List<Integer> patientIds = initializePatientIds(patientCount);
-        Collections.shuffle(patientIds); // Randomize the order of patient IDs
-
-        scheduleTasksForPatients(patientIds);
+    private static HealthDataSimulator instance = null;
+    
+    
+    private HealthDataSimulator() {
+        // Private constructor to prevent instantiation
+        this.patientCount = 50;
+        this.scheduler = Executors.newScheduledThreadPool(patientCount * 4);
+        this.outputStrategy = new ConsoleOutputStrategy();
     }
 
-    private static void parseArguments(String[] args) throws IOException {
+   
+    public void shutdown() {
+        if (scheduler != null && !scheduler.isShutdown()) {
+            scheduler.shutdown();
+            System.out.println("Scheduler shut down.");
+        }
+    }
+    public static HealthDataSimulator getInstance() {
+        if (instance == null) {
+            instance = new HealthDataSimulator();
+        }
+        return instance;
+    }
+
+    public static void main(String[] args) throws IOException {
+        HealthDataSimulator simulator = HealthDataSimulator.getInstance();
+        simulator.parseArguments(args);
+        List<Integer> patientIds = simulator.initializePatientIds(simulator.patientCount);
+        Collections.shuffle(patientIds);
+        simulator.scheduleTasksForPatients(patientIds);
+
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> simulator.shutdown()));
+    
+    }
+
+    private void parseArguments(String[] args) throws IOException {
         for (int i = 0; i < args.length; i++) {
             switch (args[i]) {
                 case "-h":
@@ -126,7 +147,7 @@ public class HealthDataSimulator {
                 "  This command simulates data for 100 patients and sends the output to WebSocket clients connected to port 8080.");
     }
 
-    private static List<Integer> initializePatientIds(int patientCount) {
+    private List<Integer> initializePatientIds(int patientCount) {
         List<Integer> patientIds = new ArrayList<>();
         for (int i = 1; i <= patientCount; i++) {
             patientIds.add(i);
@@ -134,7 +155,7 @@ public class HealthDataSimulator {
         return patientIds;
     }
 
-    private static void scheduleTasksForPatients(List<Integer> patientIds) {
+    private void scheduleTasksForPatients(List<Integer> patientIds) {
         ECGDataGenerator ecgDataGenerator = new ECGDataGenerator(patientCount);
         BloodSaturationDataGenerator bloodSaturationDataGenerator = new BloodSaturationDataGenerator(patientCount);
         BloodPressureDataGenerator bloodPressureDataGenerator = new BloodPressureDataGenerator(patientCount);
@@ -150,7 +171,7 @@ public class HealthDataSimulator {
         }
     }
 
-    private static void scheduleTask(Runnable task, long period, TimeUnit timeUnit) {
+    private void scheduleTask(Runnable task, long period, TimeUnit timeUnit) {
         scheduler.scheduleAtFixedRate(task, random.nextInt(5), period, timeUnit);
     }
 }
