@@ -1,5 +1,7 @@
 package com.alerts;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.data_management.DataStorage;
 import com.data_management.Patient;
@@ -12,7 +14,8 @@ import com.data_management.PatientRecord;
  * it against specific health criteria.
  */
 public class AlertGenerator {
-    private DataStorage dataStorage;
+   private final DataStorage dataStorage;
+    private final Map<String, AlertFactory> alertFactories;
     
     /**
      * Constructs an {@code AlertGenerator} with a specified {@code DataStorage}.
@@ -24,6 +27,12 @@ public class AlertGenerator {
      */
     public AlertGenerator(DataStorage dataStorage) {
         this.dataStorage = dataStorage;
+        this.alertFactories = new HashMap<>();
+        // Register alert factories by record type
+        alertFactories.put("HeartRate", new HeartRateAlertFactory());
+        alertFactories.put("BloodPressure", new BloodPressureAlertFactory());
+        alertFactories.put("BloodSaturation", new BloodOxygenAlertFactory());
+        alertFactories.put("ECG", new ECGAlertFactory());
     }
 
     /**
@@ -37,45 +46,34 @@ public class AlertGenerator {
      * @param patient the patient data to evaluate for alert conditions
      */
     public void evaluateData(Patient patient) {
-        // Implementation goes here
-        // For demonstration, we will assume that if the heart rate exceeds 100 bpm,
-        // an alert is triggered
-        List<PatientRecord> records = dataStorage.getRecords(patient.getPatientId(), 0, 1800000000000L);
+        List<PatientRecord> records = dataStorage.getRecords(patient.getPatientId(), 0, System.currentTimeMillis());
         for (PatientRecord record : records) {
-            //iplement the alert condition here
-            // also for ecg and other records
-            // For example, if the heart rate exceeds 100 bpm, trigger an alert
-            if (record.getRecordType().equals("HeartRate") && record.getMeasurementValue() > 100) {
-                Alert alert = new Alert(String.valueOf(patient.getPatientId()), "High Heart Rate", record.getTimestamp());
-                triggerAlert(alert);
+            String recordType = record.getRecordType();
+            AlertFactory factory = alertFactories.get(recordType);
+            if (factory != null) {
+                String condition = conditionHelper(record);
+                if (condition != null) {
+                    Alert alert = factory.createAlert(String.valueOf(patient.getPatientId()), condition, record.getTimestamp());
+                    triggerAlert(alert);
+                }
             }
-            // Add other conditions for different record types as needed
-            // For example, if the blood pressure exceeds a certain threshold
-            if (record.getRecordType().equals("BloodPressure") && record.getMeasurementValue() > 140) {
-                Alert alert = new Alert(String.valueOf(patient.getPatientId()), "High Blood Pressure", record.getTimestamp());
-                triggerAlert(alert);
-            }
-            // Add other conditions for different record types as needed
-            // For example, if the ECG shows irregular patterns
-            if (record.getRecordType().equals("ECG") && record.getMeasurementValue() > 120) {
-                Alert alert = new Alert(String.valueOf(patient.getPatientId()), "Irregular ECG", record.getTimestamp());
-                triggerAlert(alert);
-            }
-            // Add other conditions for different record types as needed
-            // For example, if the Hypotensive Hypoxemia is detected
-            if (record.getRecordType().equals("HypotensiveHypoxemia") && record.getMeasurementValue() < 90) {
-                Alert alert = new Alert(String.valueOf(patient.getPatientId()), "Hypotensive Hypoxemia", record.getTimestamp());
-                triggerAlert(alert);
-            }
-            // Add other conditions for different record types as needed
-            // For example, if the blood saturations are too low
-            if (record.getRecordType().equals("BloodSaturation") && record.getMeasurementValue() < 90) {
-                Alert alert = new Alert(String.valueOf(patient.getPatientId()), "Low Blood Saturation", record.getTimestamp());
-                triggerAlert(alert);
-            }
-            
         }
+
        
+    }
+    private String conditionHelper(PatientRecord record){
+        switch (record.getRecordType()) {
+            case "HeartRate":
+                return record.getMeasurementValue() > 100 ? "High Heart Rate" : null;
+            case "BloodPressure":
+                return record.getMeasurementValue() > 140 ? "High Blood Pressure" : null;
+            case "BloodSaturation":
+                return record.getMeasurementValue() < 90 ? "Low Blood Saturation" : null;
+            case "ECG":
+                return record.getMeasurementValue() > 120 ? "Irregular ECG" : null;
+            default:
+                return null;
+        }
     }
 
     /**
@@ -108,16 +106,17 @@ public class AlertGenerator {
         Patient patient = new Patient(1);
         patient.addRecord(95.0, "HeartRate", System.currentTimeMillis() - 10000);
         patient.addRecord(105.0, "HeartRate", System.currentTimeMillis() - 5000);
-        patient.addRecord(120.0, "BloodPressure", System.currentTimeMillis() - 20000);
-        patient.addRecord(80.0, "ECG", System.currentTimeMillis() - 15000);
+        patient.addRecord(150.0, "BloodPressure", System.currentTimeMillis() - 20000);
+        patient.addRecord(130.0, "ECG", System.currentTimeMillis() - 15000);
         patient.addRecord(85.0, "HypotensiveHypoxemia", System.currentTimeMillis() - 12000);
-        patient.addRecord(75.0, "BloodSaturation", System.currentTimeMillis() - 8000);
-        
+        patient.addRecord(88.0, "BloodSaturation", System.currentTimeMillis() - 8000);
+
         dataStorage.addPatientData(patient.getPatientId(), 105.0, "HeartRate", System.currentTimeMillis() - 5000);
-        dataStorage.addPatientData(patient.getPatientId(), 120.0, "BloodPressure", System.currentTimeMillis() - 20000);
-        dataStorage.addPatientData(patient.getPatientId(), 80.0, "ECG", System.currentTimeMillis() - 15000);
+        dataStorage.addPatientData(patient.getPatientId(), 150.0, "BloodPressure", System.currentTimeMillis() - 20000);
+        dataStorage.addPatientData(patient.getPatientId(), 130.0, "ECG", System.currentTimeMillis() - 15000);
         dataStorage.addPatientData(patient.getPatientId(), 85.0, "HypotensiveHypoxemia", System.currentTimeMillis() - 12000);
-        dataStorage.addPatientData(patient.getPatientId(), 75.0, "BloodSaturation", System.currentTimeMillis() - 8000);
+        dataStorage.addPatientData(patient.getPatientId(), 88.0, "BloodSaturation", System.currentTimeMillis() - 8000);
+
         // Evaluate the patient's data for alerts
         alertGenerator.evaluateData(patient);
 }
