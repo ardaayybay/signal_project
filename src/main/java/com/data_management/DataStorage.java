@@ -82,6 +82,10 @@ public class DataStorage {
     public List<Patient> getAllPatients() {
         return new ArrayList<>(patientMap.values());
     }
+    public Patient getPatient(int patientId) {
+        return patientMap.get(patientId);
+    }
+
 
     /**
      * The main method for the DataStorage class.
