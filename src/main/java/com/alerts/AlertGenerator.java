@@ -2,6 +2,7 @@ package com.alerts;
 
 import com.alerts.strategies.AlertStrategy;
 import com.alerts.strategies.BloodPressureStrategy;
+import com.alerts.strategies.ECGStrategy;
 import com.alerts.strategies.HeartRateStrategy;
 import com.alerts.strategies.OxygenSaturationStrategy;
 import com.cardio_generator.outputs.OutputStrategy;
@@ -33,7 +34,7 @@ public class AlertGenerator {
         strategies.put("HeartRate", new HeartRateStrategy());
         strategies.put("BloodPressure", new BloodPressureStrategy());
         strategies.put("BloodSaturation", new OxygenSaturationStrategy());
-        // Add ECG or other strategies as needed (e.g., new ECGStrategy)
+        strategies.put("ECG", new ECGStrategy());
     }
 
     /**
@@ -102,14 +103,22 @@ public class AlertGenerator {
 
         // Create a patient and add some records
         Patient patient = new Patient(1);
+        // Add HeartRate records
         patient.addRecord(95.0, "HeartRate", System.currentTimeMillis() - 10000);
         patient.addRecord(105.0, "HeartRate", System.currentTimeMillis() - 5000);
+        // Add ECG records
+        patient.addRecord(1.6, "ECG", System.currentTimeMillis() - 8000); // High QRS for alert
+        patient.addRecord(0.2, "ECG", System.currentTimeMillis() - 7000); // Normal ECG value
+        // Add other records
         patient.addRecord(150.0, "BloodPressure", System.currentTimeMillis() - 20000);
-        patient.addRecord(88.0, "BloodSaturation", System.currentTimeMillis() - 8000);
+        patient.addRecord(88.0, "BloodSaturation", System.currentTimeMillis() - 6000);
 
+        // Add records to DataStorage
         dataStorage.addPatientData(patient.getPatientId(), 105.0, "HeartRate", System.currentTimeMillis() - 5000);
+        dataStorage.addPatientData(patient.getPatientId(), 1.6, "ECG", System.currentTimeMillis() - 8000);
+        dataStorage.addPatientData(patient.getPatientId(), 0.2, "ECG", System.currentTimeMillis() - 7000);
         dataStorage.addPatientData(patient.getPatientId(), 150.0, "BloodPressure", System.currentTimeMillis() - 20000);
-        dataStorage.addPatientData(patient.getPatientId(), 88.0, "BloodSaturation", System.currentTimeMillis() - 8000);
+        dataStorage.addPatientData(patient.getPatientId(), 88.0, "BloodSaturation", System.currentTimeMillis() - 6000);
 
         // Evaluate the patient's data for alerts
         alertGenerator.evaluateData(patient);
