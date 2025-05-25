@@ -1,0 +1,11 @@
+### Motivation
+This UML class diagram demonstrates a system for handling patient data output through various strategies, modeled in draw.io. It includes one interface, OutputStrategy, and four implementing classes: ConsoleOutputStrategy, FileOutputStrategy, TcpOutputStrategy, and WebSocketOutputStrategy.
+
+OutputStrategy: Defined as an interface, it specifies a single method: output(patientId: int, timestamp: long, label: String, data: String): void. This method standardizes how patient data (identified by patientId, timestamp, label, and data) is output across different strategies.
+ConsoleOutputStrategy: A simple implementation of OutputStrategy, it directly overrides the output method to likely print data to the console. It has no additional attributes, focusing on basic console-based output.
+FileOutputStrategy: This class implements OutputStrategy with attributes baseDirectory: String for the file storage location and file_map: ConcurrentHashMap<String, String> to manage file mappings. It includes a constructor FileOutputStrategy(baseDirectory: String) and the overridden output method, enabling file-based data storage.
+TcpOutputStrategy: Implementing OutputStrategy, it uses networking with attributes serverSocket: ServerSocket, clientSocket: Socket, and out: PrintWriter for TCP communication. It provides a constructor TcpOutputStrategy(port: int) and overrides the output method to send data over a TCP connection.
+WebSocketOutputStrategy: Also implementing OutputStrategy, it has a server: WebSocketServer attribute for WebSocket communication. It includes a constructor WebSocketOutputStrategy(port: int) and overrides the output method for WebSocket-based output.
+Relationships: Each of the four classes (ConsoleOutputStrategy, FileOutputStrategy, TcpOutputStrategy, WebSocketOutputStrategy) implements the OutputStrategy interface. This design allows for polymorphic behavior, enabling the system to handle patient data output through multiple channels (console, file, TCP, WebSocket) while adhering to a unified interface.
+
+The diagram effectively demonstrates a flexible output system for patient data, supporting extensibility through additional strategy implementations.
