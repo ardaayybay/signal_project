@@ -2,7 +2,7 @@ package com.alerts.factories;
 
 import com.alerts.Alert;
 import com.alerts.BloodOxygenAlert;
-
+// Concrete factory that creates BloodOxygenAlert objects.
 public class BloodOxygenAlertFactory extends AlertFactory {
     /**
      * Creates a BloodOxygenAlert.
@@ -17,6 +17,7 @@ public class BloodOxygenAlertFactory extends AlertFactory {
         if (condition == null || condition.isEmpty()) {
             condition = "Low Blood Saturation";
         }
+        // Returns a specialized alert instance.
         return new BloodOxygenAlert(patientId, condition, timestamp);
     }
 }

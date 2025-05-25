@@ -2,7 +2,7 @@ package com.alerts.factories;
 
 import com.alerts.Alert;
 import com.alerts.ECGAlert;
-
+// Concrete factory class to create ECGAlert objects.
 public class ECGAlertFactory extends AlertFactory {
     /**
      * Creates an ECG alert for a patient.
@@ -17,6 +17,7 @@ public class ECGAlertFactory extends AlertFactory {
         if (condition == null || condition.isEmpty()) {
             condition = "Irregular ECG";
         }
+        // Instantiate and return an ECG-specific alert.
         return new ECGAlert(patientId, condition, timestamp);
     }
 }

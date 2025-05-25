@@ -2,7 +2,7 @@ package com.alerts.factories;
 
 import com.alerts.Alert;
 import com.alerts.BloodPressureAlert;
-
+// Concrete factory that creates BloodPressureAlert objects.
 public class BloodPressureAlertFactory extends AlertFactory {
     /**
      * Creates a BloodPressureAlert instance.
