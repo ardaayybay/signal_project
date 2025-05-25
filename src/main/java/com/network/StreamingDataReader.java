@@ -1,6 +1,6 @@
 package com.network;
 
 public interface StreamingDataReader {
-    void start();   // WebSocket bağlantısını başlatır
-    void stop();    // WebSocket bağlantısını durdurur
+    void start();   // WebSocket conection start
+    void stop();    // WebSocket connection stop
 }
