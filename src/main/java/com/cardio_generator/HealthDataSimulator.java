@@ -3,6 +3,9 @@ package com.cardio_generator;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Logger;
+
+import org.apache.commons.logging.Log;
 
 import com.cardio_generator.generators.AlertGenerator;
 
@@ -30,18 +33,20 @@ public class HealthDataSimulator {
     // TODO : Switch to websocket output strategy
     // TODO : Add a TCP socket output strategy
     // TODO : Create UML diagrams for the classes and their relationships
+    private OutputStrategy outputStrategyTCP = new TcpOutputStrategy(8080); // Default output strategy
+    private Logger logger;
     private int patientCount = 50; // Default number of patients
     private ScheduledExecutorService scheduler;
-    private OutputStrategy outputStrategy = new ConsoleOutputStrategy(); // Default output strategy
+    private OutputStrategy outputStrategy = new WebSocketOutputStrategy(patientCount); // Default output strategy
     private static final Random random = new Random();
-    private static HealthDataSimulator instance = null;
-    
+    private static HealthDataSimulator instance = null;    
     
     private HealthDataSimulator() {
         // Private constructor to prevent instantiation
         this.patientCount = 50;
+        this.logger = Logger.getLogger(HealthDataSimulator.class.getName());
         this.scheduler = Executors.newScheduledThreadPool(patientCount * 4);
-        this.outputStrategy = new ConsoleOutputStrategy();
+        this.outputStrategy = new WebSocketOutputStrategy(patientCount);
     }
 
    
