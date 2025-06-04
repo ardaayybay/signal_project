@@ -13,8 +13,9 @@ import com.alerts.AlertGenerator;
  */
 public class DataStorage {
     private Map<Integer, Patient> patientMap;
-
-    public DataStorage() {
+    // Singleton instance of DataStorage
+    private static DataStorage instance = null;   
+    private DataStorage() {
         this.patientMap = new HashMap<>();
     }
 
@@ -29,6 +30,17 @@ public class DataStorage {
             patientMap.put(patientId, patient);
         }
         patient.addRecord(measurementValue, recordType, timestamp);
+    }
+    /*
+     * * Retrieves the singleton instance of the DataStorage class.
+     * This method ensures that only one instance of DataStorage exists in the
+     * system,
+     */
+    public static DataStorage getInstance() {
+        if (instance == null) {
+            instance = new DataStorage();
+        }
+        return instance;
     }
 
     /**
@@ -48,32 +60,35 @@ public class DataStorage {
     public List<Patient> getAllPatients() {
         return new ArrayList<>(patientMap.values());
     }
+    public Patient getPatient(int patientId) {
+        return patientMap.get(patientId);
+    }
+
 
     /**
      * Example main method showing usage.
      */
     public static void main(String[] args) {
-        DataStorage storage = new DataStorage();
-
-        // Örnek veri ekleyelim:
-        storage.addPatientData(1, 190, "HeartRate", System.currentTimeMillis());
-        storage.addPatientData(1, 80, "Saturation", System.currentTimeMillis());
-
-        // Kayıtları yazdıralım
-        List<PatientRecord> records = storage.getRecords(1, 0, System.currentTimeMillis());
+        System.out.println("DataStorage main method running...");
+        
+        DataStorage storage = DataStorage.getInstance();
+        // Optional: Populate dummy data for testing
+        storage.addPatientData(1, 75.0, "HeartRate", 1705000000000L);
+        storage.addPatientData(1, 80.0, "HeartRate", 1706000000000L);
+    
+        List<PatientRecord> records = storage.getRecords(1, 1700000000000L, 1800000000000L);
         for (PatientRecord record : records) {
             System.out.println("Record for Patient ID: " + record.getPatientId() +
                     ", Type: " + record.getRecordType() +
                     ", Data: " + record.getMeasurementValue() +
                     ", Timestamp: " + record.getTimestamp());
         }
-
-        // AlertGenerator artık parametresiz
-        AlertGenerator alertGenerator = new AlertGenerator();
-
-        // Uyarı koşullarını kontrol edelim
+    
+        AlertGenerator alertGenerator = new AlertGenerator(storage);
+    
         for (Patient patient : storage.getAllPatients()) {
             alertGenerator.evaluateData(patient);
         }
     }
+    
 }

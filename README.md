@@ -43,8 +43,9 @@ The Cardio Data Simulator is a Java-based application designed to simulate real-
 
 After packaging, you can run the simulator directly from the executable JAR:
 
+For DataStorage
 ```sh
-java -jar target/cardio_generator-1.0-SNAPSHOT.jar
+java -jar target/cardio_generator-1.0-SNAPSHOT.jar DataStorage
 ```
 
 To run with specific options (e.g., to set the patient count and choose an output strategy):
@@ -52,6 +53,28 @@ To run with specific options (e.g., to set the patient count and choose an outpu
 ```sh
 java -jar target/cardio_generator-1.0-SNAPSHOT.jar --patient-count 100 --output file:./output
 ```
+### Unit Tests
+- All core components are tested using JUnit 5.
+- Test coverage includes:
+  - Alert generation logic
+  - Strategy checks
+  - Factory instantiation
+
+### Test Classes
+- `StrategyTests.java`
+- `FactoryTests.java`
+- `DecoratorTests.java`
+- `AlertGeneratorTest.java`
+- `MockDataReaderTest.java`
+## Code Coverage
+
+Code coverage was measured using JaCoCo 0.8.10, integrated in `pom.xml`.
+
+- Line Coverage (strategies): ≥ 40%
+- Line Coverage (data management): ≥ 60%
+- Line Coverage (decorators): ≥ 50%
+- Line Coverage (factories): ≥ 70%
+
 
 ### Supported Output Options
 

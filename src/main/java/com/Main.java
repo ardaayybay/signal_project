@@ -1,30 +1,33 @@
 package com;
 
-import com.alerts.AlertGenerator;
-import com.data_management.DataStorage;
-import com.network.WebSocketPatientClient;
+import java.io.IOException;
+import java.util.Arrays;
 
+import com.cardio_generator.HealthDataSimulator;
+import com.data_management.DataStorage;
+/*
+ * running commands:
+ * mvn clean package
+ * java -jar target\cardio_generator-1.0-SNAPSHOT.jar DataStorage
+ * below will run the data Storage class
+ * java -jar target\cardio_generator-1.0-SNAPSHOT.jar --patient-count 10 --output (strategy)  
+ * below will run the HealthDataSimulator class
+ */
 public class Main {
     public static void main(String[] args) {
-        try {
-            // 1. Veri deposu ve alarm sistemi
-            DataStorage storage = new DataStorage();
-            AlertGenerator alertGenerator = new AlertGenerator();
+    System.out.println("Main started with args: " + Arrays.toString(args));
 
-            // 2. WebSocket istemcisi (port veya URL sunucuya göre ayarlanmalı)
-            String serverUrl = "ws://localhost:8080"; // WebSocket sunucu adresi
-            WebSocketPatientClient client = new WebSocketPatientClient(serverUrl, storage, alertGenerator);
-
-            // 3. Bağlantıyı başlat
-            client.start();
-
-            // Uygulama kapanmasın diye sonsuz döngü (ctrl+c ile durdurulmalı)
-            while (true) {
-                Thread.sleep(1000);
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
+    try {
+        if (args.length > 0 && args[0].equals("DataStorage")) {
+            System.out.println("Running DataStorage...");
+            DataStorage.main(new String[]{});
+        } else {
+            System.out.println("Running HealthDataSimulator...");
+            HealthDataSimulator.main(args);
         }
+    } catch (IOException e) {
+        e.printStackTrace();
     }
 }
+}
+

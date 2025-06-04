@@ -3,7 +3,10 @@ package com.cardio_generator.generators;
 import java.util.Random;
 
 import com.cardio_generator.outputs.OutputStrategy;
-
+/**
+ * Generates blood saturation data for patients.
+ * This class simulates the generation of blood saturation values for a given number of patients.
+ */
 public class ECGDataGenerator implements PatientDataGenerator {
     private static final Random random = new Random();
     private double[] lastEcgValues;
